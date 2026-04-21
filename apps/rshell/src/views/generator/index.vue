@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineOptions({ name: 'Client' });
+defineOptions({ name: 'Generator' });
 </script>
 
 <template>

@@ -1,10 +1,11 @@
-<script lang="ts" setup>
+﻿<script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
 
 import { ElCard, ElProgress } from 'element-plus';
 
 import { IconifyIcon } from '@vben/icons';
 import { getDashboardOverviewApi, getMockDashboardOverview } from '#/api';
+import { $t } from '#/locales';
 
 defineOptions({ name: 'Dashboard' });
 
@@ -12,49 +13,52 @@ const dashboardData = ref(getMockDashboardOverview());
 
 const summaryCards = computed(() => [
   {
-    accent: '#2563eb',
-    icon: 'mdi:monitor-dashboard',
-    label: '终端总数',
+    accent: '#334155',
+    icon: 'mdi:magic-staff',
+    label: $t('page.dashboard.listenerCount'),
+    value: dashboardData.value.listenerCount,
+  },
+  {
+    accent: '#0ea5b7',
+    icon: 'mdi:headphones',
+    label: $t('page.dashboard.listenerOnlineCount'),
+    value: dashboardData.value.listenerOnlineCount,
+  },
+  {
+    accent: '#475569',
+    icon: 'mdi:devices',
+    label: $t('page.dashboard.clientCount'),
     value: dashboardData.value.clientCount,
   },
   {
-    accent: '#059669',
+    accent: '#2563eb',
     icon: 'mdi:laptop',
-    label: '在线终端',
+    label: $t('page.dashboard.clientOnlineCount'),
     value: dashboardData.value.clientOnlineCount,
-  },
-  {
-    accent: '#7c3aed',
-    icon: 'mdi:cpu-64-bit',
-    label: 'CPU 使用率',
-    value: `${dashboardData.value.cpu}%`,
-  },
-  {
-    accent: '#ea580c',
-    icon: 'mdi:memory',
-    label: '内存使用率',
-    value: `${dashboardData.value.virtual_mem}%`,
   },
 ]);
 
 const configItems = computed(() => [
-  { label: 'WEB 端口', value: dashboardData.value.web_port || '-' },
-  { label: 'Basic 认证', value: formatBoolean(dashboardData.value.web_basic_auth) },
-  { label: '版本', value: dashboardData.value.version || '-' },
+  { label: $t('page.dashboard.webPort'), value: dashboardData.value.web_port || '-' },
+  {
+    label: $t('page.dashboard.basicAuth'),
+    value: formatBoolean(dashboardData.value.web_basic_auth),
+  },
+  { label: $t('page.dashboard.version'), value: dashboardData.value.version || '-' },
 ]);
 
 const systemProgressItems = computed(() => [
-  { label: '处理器', value: dashboardData.value.cpu },
-  { label: '磁盘', value: dashboardData.value.disk },
-  { label: '内存', value: dashboardData.value.virtual_mem },
-  { label: '虚拟内存', value: dashboardData.value.swap_mem },
+  { label: $t('page.dashboard.cpu'), value: dashboardData.value.cpu },
+  { label: $t('page.dashboard.disk'), value: dashboardData.value.disk },
+  { label: $t('page.dashboard.memory'), value: dashboardData.value.virtual_mem },
+  { label: $t('page.dashboard.swapMemory'), value: dashboardData.value.swap_mem },
 ]);
 
 const systemInfoItems = computed(() => [
-  { label: 'TCP 连接数', value: dashboardData.value.tcpCount },
-  { label: 'UDP 连接数', value: dashboardData.value.udpCount },
-  { label: '流出带宽', value: formatBytes(dashboardData.value.exportFlowCount) },
-  { label: '流入带宽', value: formatBytes(dashboardData.value.inletFlowCount) },
+  { label: $t('page.dashboard.tcpCount'), value: dashboardData.value.tcpCount },
+  { label: $t('page.dashboard.udpCount'), value: dashboardData.value.udpCount },
+  { label: $t('page.dashboard.exportFlow'), value: formatBytes(dashboardData.value.exportFlowCount) },
+  { label: $t('page.dashboard.inletFlow'), value: formatBytes(dashboardData.value.inletFlowCount) },
 ]);
 
 async function loadDashboardData() {
@@ -66,7 +70,7 @@ async function loadDashboardData() {
 }
 
 function formatBoolean(value: boolean) {
-  return value ? '已启用' : '未启用';
+  return value ? $t('page.dashboard.enabled') : $t('page.dashboard.disabled');
 }
 
 function formatBytes(value: number) {
@@ -100,7 +104,10 @@ onMounted(() => {
         <div class="summary-head">{{ card.label }}</div>
         <div class="summary-body">
           <div class="summary-value">{{ card.value }}</div>
-          <div class="summary-icon" :style="{ backgroundColor: `${card.accent}14`, color: card.accent }">
+          <div
+            class="summary-icon"
+            :style="{ backgroundColor: `${card.accent}14`, color: card.accent }"
+          >
             <IconifyIcon :icon="card.icon" />
           </div>
         </div>
@@ -110,7 +117,7 @@ onMounted(() => {
     <div class="panel-grid">
       <ElCard shadow="never" class="panel-card">
         <template #header>
-          <div class="panel-title">配置信息</div>
+          <div class="panel-title">{{ $t('page.dashboard.configInfo') }}</div>
         </template>
         <div class="info-list">
           <div v-for="item in configItems" :key="item.label" class="info-row">
@@ -122,11 +129,15 @@ onMounted(() => {
 
       <ElCard shadow="never" class="panel-card">
         <template #header>
-          <div class="panel-title">系统信息</div>
+          <div class="panel-title">{{ $t('page.dashboard.systemInfo') }}</div>
         </template>
         <div class="system-content">
           <div class="progress-list">
-            <div v-for="item in systemProgressItems" :key="item.label" class="progress-item">
+            <div
+              v-for="item in systemProgressItems"
+              :key="item.label"
+              class="progress-item"
+            >
               <div class="progress-label-row">
                 <span>{{ item.label }}</span>
                 <span>{{ item.value }}%</span>

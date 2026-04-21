@@ -45,9 +45,9 @@ const show = ref(false);
     <div
       :class="{
         'top-3': !!passwordStrength,
-        'top-1/2 -translate-y-1/2 items-center': !passwordStrength,
+        'top-1/2 -translate-y-1/2': !passwordStrength,
       }"
-      class="text-foreground/60 hover:text-foreground absolute inset-y-0 right-0 flex cursor-pointer pr-3 text-lg leading-5"
+      class="text-foreground/60 hover:text-foreground absolute right-3 z-10 flex cursor-pointer items-center justify-center text-lg leading-none"
       @click="show = !show"
     >
       <Eye v-if="show" class="size-4" />

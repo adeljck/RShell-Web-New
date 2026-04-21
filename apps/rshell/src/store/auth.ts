@@ -63,6 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
 
         if (userInfo?.realName) {
           ElNotification({
+            duration: 2000,
             message: `${$t('authentication.loginSuccessDesc')}:${userInfo?.realName}`,
             title: $t('authentication.loginSuccess'),
             type: 'success',

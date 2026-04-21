@@ -1,5 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router';
 
+import { $t } from '#/locales';
+
 const routes: RouteRecordRaw[] = [
   {
     name: 'About',
@@ -7,8 +9,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('#/views/about/index.vue'),
     meta: {
       icon: 'mdi:information',
-      order: -1,
-      title: '关于',
+      order: 3,
+      title: $t('page.about.title'),
     },
   },
 ];

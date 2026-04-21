@@ -1,8 +1,89 @@
-{
+﻿{
   "auth": {
     "login": "登录"
   },
   "dashboard": {
-    "title": "仪表盘"
+    "title": "仪表盘",
+    "listenerCount": "监听总数",
+    "listenerOnlineCount": "在线监听数",
+    "clientCount": "客户端总数",
+    "clientOnlineCount": "在线客户端",
+    "webPort": "WEB 端口",
+    "basicAuth": "Basic 认证",
+    "version": "版本",
+    "cpu": "处理器",
+    "disk": "磁盘",
+    "memory": "内存",
+    "swapMemory": "虚拟内存",
+    "tcpCount": "TCP 连接数",
+    "udpCount": "UDP 连接数",
+    "exportFlow": "流出带宽",
+    "inletFlow": "流入带宽",
+    "enabled": "已启用",
+    "disabled": "未启用",
+    "configInfo": "配置信息",
+    "systemInfo": "系统信息"
+  },
+  "client": {
+    "title": "客户端管理"
+  },
+  "listener": {
+    "title": "监听管理",
+    "batchSelect": "批量选择",
+    "add": "新增监听",
+    "online": "在线",
+    "offline": "离线",
+    "pending": "待实现",
+    "tools": {
+      "refresh": "刷新",
+      "density": "密度",
+      "columns": "列设置"
+    },
+    "columns": {
+      "id": "ID",
+      "remark": "备注",
+      "mode": "模式",
+      "listenAddr": "监听地址",
+      "connectAddr": "外网连接地址",
+      "disconnectTimeout": "超时心跳次数（次）",
+      "pingInterval": "心跳间隔（秒）",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "actions": {
+      "enable": "启用",
+      "disable": "停用",
+      "edit": "编辑",
+      "command": "上线命令查看",
+      "delete": "删除"
+    }
+  },
+  "generator": {
+    "title": "客户端生成"
+  },
+  "plugin": {
+    "title": "插件运行"
+  },
+  "tunnel": {
+    "title": "隧道代理"
+  },
+  "setting": {
+    "title": "系统设置",
+    "pageTitle": "设置",
+    "subtitle": "无需重启修改部分设置",
+    "placeholder": "请输入",
+    "loading": "加载中...",
+    "save": "保存",
+    "saveSuccess": "保存成功",
+    "saveError": "保存失败",
+    "fields": {
+      "dingToken": "钉钉 token",
+      "dingKeyword": "钉钉 key_word",
+      "wxKey": "微信 wx_key"
+    }
+  },
+  "about": {
+    "title": "关于",
+    "releaseDetails": "更新详情"
   }
 }

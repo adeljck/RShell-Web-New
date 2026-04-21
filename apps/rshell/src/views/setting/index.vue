@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 
-import { ElMessage } from 'element-plus';
+import { ElButton, ElInput, ElMessage } from 'element-plus';
 
 import { getMockSetting, getSettingApi, updateSettingApi } from '#/api';
+import { $t } from '#/locales';
 
 defineOptions({ name: 'Setting' });
 
@@ -27,9 +28,9 @@ async function handleSave() {
   try {
     const result = await updateSettingApi({ ...settingForm });
     Object.assign(settingForm, result);
-    ElMessage.success('保存成功');
+    ElMessage.success($t('page.setting.saveSuccess'));
   } catch {
-    ElMessage.error('保存失败');
+    ElMessage.error($t('page.setting.saveError'));
   } finally {
     saveLoading.value = false;
   }
@@ -43,53 +44,55 @@ onMounted(() => {
 <template>
   <div class="setting-page">
     <div class="setting-header">
-      <h1 class="setting-title">设置</h1>
-      <p class="setting-subtitle">无需重启修改部分设置</p>
+      <h1 class="setting-title">{{ $t('page.setting.pageTitle') }}</h1>
+      <p class="setting-subtitle">{{ $t('page.setting.subtitle') }}</p>
     </div>
 
     <div class="setting-panel">
-      <div v-if="loading" class="setting-loading">加载中...</div>
+      <div v-if="loading" class="setting-loading">
+        {{ $t('page.setting.loading') }}
+      </div>
 
       <div v-else class="setting-form">
         <div class="setting-row">
-          <div class="setting-label">钉钉 token</div>
+          <div class="setting-label">{{ $t('page.setting.fields.dingToken') }}</div>
           <div class="setting-control">
             <ElInput
               v-model="settingForm.dingding_access_token"
               :disabled="saveLoading"
+              :placeholder="$t('page.setting.placeholder')"
               clearable
-              placeholder="请输入"
             />
           </div>
         </div>
 
         <div class="setting-row">
-          <div class="setting-label">钉钉 key_word</div>
+          <div class="setting-label">{{ $t('page.setting.fields.dingKeyword') }}</div>
           <div class="setting-control">
             <ElInput
               v-model="settingForm.dingding_key_word"
               :disabled="saveLoading"
+              :placeholder="$t('page.setting.placeholder')"
               clearable
-              placeholder="请输入"
             />
           </div>
         </div>
 
         <div class="setting-row">
-          <div class="setting-label">微信 wx_key</div>
+          <div class="setting-label">{{ $t('page.setting.fields.wxKey') }}</div>
           <div class="setting-control">
             <ElInput
               v-model="settingForm.wx_key"
               :disabled="saveLoading"
+              :placeholder="$t('page.setting.placeholder')"
               clearable
-              placeholder="请输入"
             />
           </div>
         </div>
 
         <div class="setting-actions">
           <ElButton type="primary" :loading="saveLoading" @click="handleSave">
-            保存
+            {{ $t('page.setting.save') }}
           </ElButton>
         </div>
       </div>
@@ -101,31 +104,32 @@ onMounted(() => {
 .setting-page {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 12px;
+  gap: 22px;
+  padding: 12px 8px 0;
 }
 
 .setting-header {
-  padding: 8px 6px 0;
+  padding: 8px 8px 0;
 }
 
 .setting-title {
   margin: 0;
   color: var(--el-text-color-primary);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
+  line-height: 1.25;
 }
 
 .setting-subtitle {
-  margin: 28px 0 0;
+  margin: 18px 0 0;
   color: var(--el-text-color-regular);
   font-size: 14px;
+  line-height: 1.6;
 }
 
 .setting-panel {
-  min-height: 360px;
+  min-height: 280px;
   border: 1px solid var(--el-border-color-lighter);
-  border-radius: 12px;
   background: var(--el-bg-color);
 }
 
@@ -136,43 +140,43 @@ onMounted(() => {
 }
 
 .setting-form {
-  padding: 40px 48px 48px;
+  padding: 32px 28px 30px;
 }
 
 .setting-row {
   display: flex;
   align-items: center;
   gap: 28px;
-  margin-bottom: 36px;
+  margin-bottom: 26px;
 }
 
 .setting-label {
-  width: 140px;
+  width: 120px;
   color: var(--el-text-color-primary);
-  font-size: 16px;
+  font-size: 14px;
   text-align: right;
   white-space: nowrap;
 }
 
 .setting-control {
-  width: 480px;
+  width: 600px;
   max-width: 100%;
 }
 
 .setting-actions {
-  padding-left: 168px;
+  padding-left: 148px;
 }
 
 @media (max-width: 900px) {
   .setting-form {
-    padding: 24px 20px 32px;
+    padding: 24px 20px 28px;
   }
 
   .setting-row {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: 10px;
+    margin-bottom: 20px;
   }
 
   .setting-label,

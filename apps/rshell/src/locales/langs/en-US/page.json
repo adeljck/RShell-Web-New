@@ -1,8 +1,89 @@
-{
+﻿{
   "auth": {
     "login": "Login"
   },
   "dashboard": {
-    "title": "Dashboard"
+    "title": "Dashboard",
+    "listenerCount": "Listeners",
+    "listenerOnlineCount": "Online Listeners",
+    "clientCount": "Clients",
+    "clientOnlineCount": "Online Clients",
+    "webPort": "WEB Port",
+    "basicAuth": "Basic Auth",
+    "version": "Version",
+    "cpu": "CPU",
+    "disk": "Disk",
+    "memory": "Memory",
+    "swapMemory": "Swap Memory",
+    "tcpCount": "TCP Connections",
+    "udpCount": "UDP Connections",
+    "exportFlow": "Outbound Bandwidth",
+    "inletFlow": "Inbound Bandwidth",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "configInfo": "Configuration",
+    "systemInfo": "System Information"
+  },
+  "client": {
+    "title": "Client Management"
+  },
+  "listener": {
+    "title": "Listener Management",
+    "batchSelect": "Batch Select",
+    "add": "New Listener",
+    "online": "Online",
+    "offline": "Offline",
+    "pending": " (pending)",
+    "tools": {
+      "refresh": "Refresh",
+      "density": "Density",
+      "columns": "Column Settings"
+    },
+    "columns": {
+      "id": "ID",
+      "remark": "Remark",
+      "mode": "Mode",
+      "listenAddr": "Listen Address",
+      "connectAddr": "External Connect Address",
+      "disconnectTimeout": "Heartbeat Timeout Count",
+      "pingInterval": "Heartbeat Interval (s)",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "actions": {
+      "enable": "Enable",
+      "disable": "Disable",
+      "edit": "Edit",
+      "command": "View Launch Command",
+      "delete": "Delete"
+    }
+  },
+  "generator": {
+    "title": "Client Builder"
+  },
+  "plugin": {
+    "title": "Plugin Runtime"
+  },
+  "tunnel": {
+    "title": "Tunnel Proxy"
+  },
+  "setting": {
+    "title": "System Settings",
+    "pageTitle": "Settings",
+    "subtitle": "Some settings can be modified without restarting.",
+    "placeholder": "Please enter",
+    "loading": "Loading...",
+    "save": "Save",
+    "saveSuccess": "Saved successfully",
+    "saveError": "Save failed",
+    "fields": {
+      "dingToken": "DingTalk token",
+      "dingKeyword": "DingTalk key_word",
+      "wxKey": "WeChat wx_key"
+    }
+  },
+  "about": {
+    "title": "About",
+    "releaseDetails": "Release Details"
   }
 }

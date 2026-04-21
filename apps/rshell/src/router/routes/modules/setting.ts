@@ -1,5 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router';
 
+import { $t } from '#/locales';
+
 const routes: RouteRecordRaw[] = [
   {
     name: 'Setting',
@@ -7,8 +9,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('#/views/setting/index.vue'),
     meta: {
       icon: 'mdi:cog',
-      order: -2,
-      title: '系统设置',
+      order: 2,
+      title: $t('page.setting.title'),
     },
   },
 ];

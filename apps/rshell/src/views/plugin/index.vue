@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineOptions({ name: 'Client' });
+defineOptions({ name: 'Plugin' });
 </script>
 
 <template>

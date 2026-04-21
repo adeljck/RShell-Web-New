@@ -1,5 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router';
 
+import { $t } from '#/locales';
+
 const routes: RouteRecordRaw[] = [
   {
     name: 'Client',
@@ -8,7 +10,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       icon: 'mdi:monitor',
       order: -3,
-      title: '终端管理',
+      title: $t('page.client.title'),
     },
   },
 ];
