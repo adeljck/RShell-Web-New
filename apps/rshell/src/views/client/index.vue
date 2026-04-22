@@ -3,5 +3,5 @@ defineOptions({ name: 'Client' });
 </script>
 
 <template>
-  <div />
+  <div></div>
 </template>

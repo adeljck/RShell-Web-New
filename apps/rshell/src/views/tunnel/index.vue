@@ -3,5 +3,5 @@ defineOptions({ name: 'Tunnel' });
 </script>
 
 <template>
-  <div />
+  <div></div>
 </template>

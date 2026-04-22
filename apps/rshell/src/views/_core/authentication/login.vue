@@ -4,8 +4,8 @@ import type { VbenFormSchema } from '@vben/common-ui';
 import { computed } from 'vue';
 
 import { AuthenticationLogin, z } from '@vben/common-ui';
-import { preferences } from '@vben/preferences';
 import { $t } from '@vben/locales';
+import { preferences } from '@vben/preferences';
 
 import { useAuthStore } from '#/store';
 
@@ -70,22 +70,22 @@ const formSchema = computed((): VbenFormSchema[] => {
 
 .login-brand {
   display: flex;
+  gap: 0.75rem;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
 }
 
 .login-brand__logo {
+  flex-shrink: 0;
   width: 2.5rem;
   height: 2.5rem;
   object-fit: contain;
-  flex-shrink: 0;
 }
 
 .login-brand__name {
-  color: hsl(var(--foreground));
   font-size: 1.625rem;
   font-weight: 700;
   line-height: 1;
+  color: hsl(var(--foreground));
 }
 </style>

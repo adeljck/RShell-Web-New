@@ -3,5 +3,5 @@ defineOptions({ name: 'Plugin' });
 </script>
 
 <template>
-  <div />
+  <div></div>
 </template>

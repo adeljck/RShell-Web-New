@@ -1,9 +1,10 @@
 ﻿<script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
 
+import { IconifyIcon } from '@vben/icons';
+
 import { ElCard, ElProgress } from 'element-plus';
 
-import { IconifyIcon } from '@vben/icons';
 import { getDashboardOverviewApi, getMockDashboardOverview } from '#/api';
 import { $t } from '#/locales';
 
@@ -39,26 +40,44 @@ const summaryCards = computed(() => [
 ]);
 
 const configItems = computed(() => [
-  { label: $t('page.dashboard.webPort'), value: dashboardData.value.web_port || '-' },
+  {
+    label: $t('page.dashboard.webPort'),
+    value: dashboardData.value.web_port || '-',
+  },
   {
     label: $t('page.dashboard.basicAuth'),
     value: formatBoolean(dashboardData.value.web_basic_auth),
   },
-  { label: $t('page.dashboard.version'), value: dashboardData.value.version || '-' },
+  {
+    label: $t('page.dashboard.version'),
+    value: dashboardData.value.version || '-',
+  },
 ]);
 
 const systemProgressItems = computed(() => [
   { label: $t('page.dashboard.cpu'), value: dashboardData.value.cpu },
   { label: $t('page.dashboard.disk'), value: dashboardData.value.disk },
-  { label: $t('page.dashboard.memory'), value: dashboardData.value.virtual_mem },
-  { label: $t('page.dashboard.swapMemory'), value: dashboardData.value.swap_mem },
+  {
+    label: $t('page.dashboard.memory'),
+    value: dashboardData.value.virtual_mem,
+  },
+  {
+    label: $t('page.dashboard.swapMemory'),
+    value: dashboardData.value.swap_mem,
+  },
 ]);
 
 const systemInfoItems = computed(() => [
   { label: $t('page.dashboard.tcpCount'), value: dashboardData.value.tcpCount },
   { label: $t('page.dashboard.udpCount'), value: dashboardData.value.udpCount },
-  { label: $t('page.dashboard.exportFlow'), value: formatBytes(dashboardData.value.exportFlowCount) },
-  { label: $t('page.dashboard.inletFlow'), value: formatBytes(dashboardData.value.inletFlowCount) },
+  {
+    label: $t('page.dashboard.exportFlow'),
+    value: formatBytes(dashboardData.value.exportFlowCount),
+  },
+  {
+    label: $t('page.dashboard.inletFlow'),
+    value: formatBytes(dashboardData.value.inletFlowCount),
+  },
 ]);
 
 async function loadDashboardData() {
@@ -151,7 +170,11 @@ onMounted(() => {
           </div>
 
           <div class="info-list compact">
-            <div v-for="item in systemInfoItems" :key="item.label" class="info-row">
+            <div
+              v-for="item in systemInfoItems"
+              :key="item.label"
+              class="info-row"
+            >
               <span class="info-label">{{ item.label }}</span>
               <span class="info-value">{{ item.value }}</span>
             </div>
@@ -188,10 +211,10 @@ onMounted(() => {
 
 .summary-head {
   padding: 16px 20px;
-  border-bottom: 1px solid var(--el-border-color-lighter);
-  color: var(--el-text-color-primary);
   font-size: 16px;
   font-weight: 700;
+  color: var(--el-text-color-primary);
+  border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
 .summary-body {
@@ -203,10 +226,10 @@ onMounted(() => {
 }
 
 .summary-value {
-  color: var(--el-text-color-primary);
   font-size: 46px;
   font-weight: 700;
   line-height: 1;
+  color: var(--el-text-color-primary);
 }
 
 .summary-icon {
@@ -238,9 +261,9 @@ onMounted(() => {
 }
 
 .panel-title {
-  color: var(--el-text-color-primary);
   font-size: 18px;
   font-weight: 700;
+  color: var(--el-text-color-primary);
 }
 
 .info-list {
@@ -255,20 +278,20 @@ onMounted(() => {
 
 .info-row {
   display: flex;
+  gap: 16px;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
 }
 
 .info-label {
-  color: var(--el-text-color-primary);
   font-size: 15px;
+  color: var(--el-text-color-primary);
 }
 
 .info-value {
-  color: var(--el-text-color-primary);
   font-size: 15px;
   font-weight: 500;
+  color: var(--el-text-color-primary);
   text-align: right;
 }
 
@@ -288,8 +311,8 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
-  color: var(--el-text-color-primary);
   font-size: 15px;
+  color: var(--el-text-color-primary);
 }
 
 @media (max-width: 1200px) {

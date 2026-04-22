@@ -3,5 +3,5 @@ defineOptions({ name: 'Generator' });
 </script>
 
 <template>
-  <div />
+  <div></div>
 </template>

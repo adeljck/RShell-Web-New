@@ -55,7 +55,9 @@ onMounted(() => {
 
       <div v-else class="setting-form">
         <div class="setting-row">
-          <div class="setting-label">{{ $t('page.setting.fields.dingToken') }}</div>
+          <div class="setting-label">
+            {{ $t('page.setting.fields.dingToken') }}
+          </div>
           <div class="setting-control">
             <ElInput
               v-model="settingForm.dingding_access_token"
@@ -67,7 +69,9 @@ onMounted(() => {
         </div>
 
         <div class="setting-row">
-          <div class="setting-label">{{ $t('page.setting.fields.dingKeyword') }}</div>
+          <div class="setting-label">
+            {{ $t('page.setting.fields.dingKeyword') }}
+          </div>
           <div class="setting-control">
             <ElInput
               v-model="settingForm.dingding_key_word"
@@ -114,29 +118,29 @@ onMounted(() => {
 
 .setting-title {
   margin: 0;
-  color: var(--el-text-color-primary);
   font-size: 22px;
   font-weight: 700;
   line-height: 1.25;
+  color: var(--el-text-color-primary);
 }
 
 .setting-subtitle {
   margin: 18px 0 0;
-  color: var(--el-text-color-regular);
   font-size: 14px;
   line-height: 1.6;
+  color: var(--el-text-color-regular);
 }
 
 .setting-panel {
   min-height: 280px;
-  border: 1px solid var(--el-border-color-lighter);
   background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
 }
 
 .setting-loading {
   padding: 28px 24px;
-  color: var(--el-text-color-regular);
   font-size: 14px;
+  color: var(--el-text-color-regular);
 }
 
 .setting-form {
@@ -145,15 +149,15 @@ onMounted(() => {
 
 .setting-row {
   display: flex;
-  align-items: center;
   gap: 28px;
+  align-items: center;
   margin-bottom: 26px;
 }
 
 .setting-label {
   width: 120px;
-  color: var(--el-text-color-primary);
   font-size: 14px;
+  color: var(--el-text-color-primary);
   text-align: right;
   white-space: nowrap;
 }
@@ -174,8 +178,8 @@ onMounted(() => {
 
   .setting-row {
     flex-direction: column;
-    align-items: stretch;
     gap: 10px;
+    align-items: stretch;
     margin-bottom: 20px;
   }
 

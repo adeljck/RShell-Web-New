@@ -57,10 +57,10 @@ onMounted(() => {
 
 .about-title {
   margin: 0;
-  color: var(--el-text-color-primary);
   font-size: 28px;
   font-weight: 700;
   line-height: 1.2;
+  color: var(--el-text-color-primary);
 }
 
 .about-card {
@@ -78,17 +78,17 @@ onMounted(() => {
 }
 
 .about-card__title {
-  color: var(--el-text-color-primary);
   font-size: 16px;
   font-weight: 700;
+  color: var(--el-text-color-primary);
 }
 
 .about-list {
-  margin: 0;
   padding-left: 18px;
-  color: var(--el-text-color-primary);
+  margin: 0;
   font-size: 14px;
   line-height: 1.9;
+  color: var(--el-text-color-primary);
 }
 
 .about-list__item + .about-list__item {

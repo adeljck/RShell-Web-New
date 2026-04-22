@@ -33,12 +33,12 @@ const logoDark = computed(() => preferences.logo.sourceDark);
 }
 
 .rshell-auth-layout:deep(.side-content[data-side='bottom']) {
-  max-width: 22rem;
-  min-height: 22rem;
-  margin-top: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  max-width: 22rem;
+  min-height: 22rem;
+  margin-top: 0;
 }
 
 @media (max-width: 768px) {
