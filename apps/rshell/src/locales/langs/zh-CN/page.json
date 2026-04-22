@@ -30,7 +30,11 @@
   "listener": {
     "title": "监听管理",
     "batchSelect": "批量选择",
+    "batchDelete": "批量删除",
     "add": "新增监听",
+    "selectedPrefix": "已选择",
+    "selectedSuffix": "条记录",
+    "clear": "清空",
     "online": "在线",
     "offline": "离线",
     "pending": "待实现",
@@ -38,6 +42,30 @@
       "refresh": "刷新",
       "density": "密度",
       "columns": "列设置"
+    },
+    "drawer": {
+      "title": "新增监听",
+      "create": "新增",
+      "placeholder": "请输入",
+      "fields": {
+        "mode": "模式",
+        "remark": "备注",
+        "listenAddr": "监听地址",
+        "connectAddr": "外网连接地址",
+        "wsConnectAddr": "WS连接地址",
+        "dnsDomain": "NS域名",
+        "publicDns": "公共DNS地址",
+        "publicDoh": "公共DOH地址",
+        "publicDot": "公共DOT地址",
+        "disconnectTimeout": "超时心跳次数",
+        "pingInterval": "心跳间隔",
+        "vkey": "密钥",
+        "encryptSalt": "流量加密盐",
+        "ossUrl": "Bucket域名"
+      },
+      "validation": {
+        "required": "请填写完整必填项"
+      }
     },
     "columns": {
       "id": "ID",
@@ -56,6 +84,20 @@
       "edit": "编辑",
       "command": "上线命令查看",
       "delete": "删除"
+    },
+    "confirm": {
+      "batchDeleteDescription": "确认后将删除所选监听，是否继续？",
+      "batchDeleteTitle": "确认批量删除",
+      "cancel": "取消",
+      "confirm": "确认",
+      "deleteDescription": "删除后将无法恢复，是否继续？",
+      "deleteTitle": "是否确认删除监听"
+    },
+    "messages": {
+      "addSuccess": "新增成功",
+      "deleteSuccess": "删除成功",
+      "startSuccess": "启用成功",
+      "stopSuccess": "停用成功"
     }
   },
   "generator": {

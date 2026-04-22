@@ -30,7 +30,11 @@
   "listener": {
     "title": "Listener Management",
     "batchSelect": "Batch Select",
+    "batchDelete": "Batch Delete",
     "add": "New Listener",
+    "selectedPrefix": "Selected ",
+    "selectedSuffix": " records",
+    "clear": "Clear",
     "online": "Online",
     "offline": "Offline",
     "pending": " (pending)",
@@ -38,6 +42,30 @@
       "refresh": "Refresh",
       "density": "Density",
       "columns": "Column Settings"
+    },
+    "drawer": {
+      "title": "New Listener",
+      "create": "Create",
+      "placeholder": "Please enter",
+      "fields": {
+        "mode": "Mode",
+        "remark": "Remark",
+        "listenAddr": "Listen Address",
+        "connectAddr": "External Connect Address",
+        "wsConnectAddr": "WS Connect Address",
+        "dnsDomain": "NS Domain",
+        "publicDns": "Public DNS Address",
+        "publicDoh": "Public DOH Address",
+        "publicDot": "Public DOT Address",
+        "disconnectTimeout": "Heartbeat Timeout Count",
+        "pingInterval": "Heartbeat Interval",
+        "vkey": "Key",
+        "encryptSalt": "Traffic Encryption Salt",
+        "ossUrl": "Bucket Domain"
+      },
+      "validation": {
+        "required": "Please complete all required fields"
+      }
     },
     "columns": {
       "id": "ID",
@@ -56,6 +84,20 @@
       "edit": "Edit",
       "command": "View Launch Command",
       "delete": "Delete"
+    },
+    "confirm": {
+      "batchDeleteDescription": "The selected listeners will be deleted after confirmation. Continue?",
+      "batchDeleteTitle": "Confirm Batch Delete",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "deleteDescription": "This action cannot be undone. Continue?",
+      "deleteTitle": "Are you sure you want to delete this listener?"
+    },
+    "messages": {
+      "addSuccess": "Created successfully",
+      "deleteSuccess": "Deleted successfully",
+      "startSuccess": "Started successfully",
+      "stopSuccess": "Stopped successfully"
     }
   },
   "generator": {

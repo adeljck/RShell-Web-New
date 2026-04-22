@@ -1,45 +1,127 @@
 <script setup lang="ts">
-import type { ListenerListResult, ListenerRecord } from '#/api';
+import type { ListenerAddPayload, ListenerListResult, ListenerRecord } from '#/api';
 
-import { h } from 'vue';
-
+import { computed, ref } from 'vue';
 import { IconifyIcon } from '@vben/icons';
+import {
+  confirm,
+  useVbenDrawer,
+  VbenButton,
+  VbenIconButton,
+} from '@vben/common-ui';
 
-import { ElButton, ElMessage, ElTag } from 'element-plus';
+import { ElMessage } from 'element-plus';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getListenerListApi, getMockListenerList } from '#/api';
+import {
+  addListenerApi,
+  deleteListenerApi,
+  deleteListenerListApi,
+  getListenerListApi,
+  getMockListenerList,
+  startListenerApi,
+  stopListenerApi,
+} from '#/api';
 import { $t } from '#/locales';
+
+import {
+  createListenerGridOptions,
+  type ListenerActionType,
+} from './listener-table';
+import ListenerCreateDrawer from './listener-create-drawer.vue';
 
 defineOptions({ name: 'Listener' });
 
-function getExternalAddr(item: ListenerRecord) {
-  return item.WsConnectAddr || item.ConnectAddr || '-';
-}
+const LISTENER_REQUEST_TIMEOUT = 1500;
+const batchSelectionEnabled = ref(false);
+const selectedRows = ref<ListenerRecord[]>([]);
+const listenerCreateDrawerRef = ref<{
+  reset: () => void;
+  submit: () => Promise<ListenerAddPayload | null>;
+} | null>(null);
 
-function getStatusText(status: boolean) {
-  return status ? $t('page.listener.online') : $t('page.listener.offline');
-}
+const selectedCount = computed(() => selectedRows.value.length);
+const hasSelection = computed(() => selectedCount.value > 0);
+const batchDeleteIds = computed(() => selectedRows.value.map((item) => item.Id));
 
 function handlePending(action: string) {
   ElMessage.info(`${action}${$t('page.listener.pending')}`);
 }
 
-function getCellTooltipContent(row: ListenerRecord, field?: string) {
-  if (!field) {
-    return null;
+function getGridOptions(showCheckboxColumn = batchSelectionEnabled.value) {
+  return createListenerGridOptions({
+    getListenerResult,
+    onAction: handleRowAction,
+    showCheckboxColumn,
+    t: $t,
+  });
+}
+
+async function handleRowAction(
+  action: ListenerActionType,
+  row: ListenerRecord,
+) {
+  switch (action) {
+    case 'enable': {
+      try {
+        await startListenerApi({ id: row.Id });
+        ElMessage.success($t('page.listener.messages.startSuccess'));
+        await gridApi.reload();
+        syncSelectedRows();
+      } catch {}
+      return;
+    }
+    case 'disable': {
+      try {
+        await stopListenerApi({ id: row.Id });
+        ElMessage.success($t('page.listener.messages.stopSuccess'));
+        await gridApi.reload();
+        syncSelectedRows();
+      } catch {}
+      return;
+    }
+    case 'delete': {
+      try {
+        await confirm({
+          cancelText: $t('page.listener.confirm.cancel'),
+          confirmText: $t('page.listener.confirm.confirm'),
+          content: $t('page.listener.confirm.deleteDescription'),
+          title: $t('page.listener.confirm.deleteTitle'),
+        });
+        await deleteListenerApi({ id: row.Id });
+        ElMessage.success($t('page.listener.messages.deleteSuccess'));
+        await gridApi.reload();
+        syncSelectedRows();
+      } catch {}
+      return;
+    }
+    default: {
+      const actionLabelMap: Record<Exclude<ListenerActionType, 'delete' | 'disable' | 'enable'>, string> = {
+        command: $t('page.listener.actions.command'),
+        edit: $t('page.listener.actions.edit'),
+      };
+      handlePending(actionLabelMap[action]);
+    }
+  }
+}
+
+async function handleCreateConfirm() {
+  const payload = await listenerCreateDrawerRef.value?.submit();
+  if (!payload) {
+    return;
   }
 
-  if (field === 'ConnectAddr') {
-    return getExternalAddr(row);
+  createDrawerApi.lock();
+  try {
+    await addListenerApi(payload);
+    ElMessage.success($t('page.listener.messages.addSuccess'));
+    createDrawerApi.close();
+    await gridApi.reload();
+    syncSelectedRows();
+  } catch {
+  } finally {
+    createDrawerApi.unlock();
   }
-
-  const value = row[field as keyof ListenerRecord];
-  if (value === null || value === undefined || value === '') {
-    return '-';
-  }
-
-  return String(value);
 }
 
 async function getListenerResult(): Promise<ListenerListResult> {
@@ -49,7 +131,7 @@ async function getListenerResult(): Promise<ListenerListResult> {
       new Promise<ListenerListResult>((_, reject) => {
         setTimeout(() => {
           reject(new Error('listener request timeout'));
-        }, 1500);
+        }, LISTENER_REQUEST_TIMEOUT);
       }),
     ]);
   } catch {
@@ -57,292 +139,79 @@ async function getListenerResult(): Promise<ListenerListResult> {
   }
 }
 
-function normalizeSortValue(value: unknown) {
-  if (typeof value === 'boolean') {
-    return value ? 1 : 0;
-  }
-  if (typeof value === 'number') {
-    return value;
-  }
-  if (typeof value === 'string') {
-    return value.toLowerCase();
-  }
-  if (value === null || value === undefined) {
-    return '';
-  }
-  return String(value).toLowerCase();
-}
-
-function sortListenerItems(
-  items: ListenerRecord[],
-  sort?: null | {
-    field?: keyof ListenerRecord | string;
-    order?: 'asc' | 'ascend' | 'desc' | 'descend' | null;
-  },
-) {
-  if (!sort?.field || !sort?.order) {
-    return items;
-  }
-
-  const direction = ['desc', 'descend'].includes(sort.order) ? -1 : 1;
-  const field = sort.field as keyof ListenerRecord;
-
-  return [...items].toSorted((left, right) => {
-    const leftValue = normalizeSortValue(left[field]);
-    const rightValue = normalizeSortValue(right[field]);
-
-    if (leftValue === rightValue) {
-      return 0;
-    }
-
-    return leftValue > rightValue ? direction : -direction;
-  });
-}
-
-async function queryListenerList({
-  page,
-  sort,
-}: {
-  page: {
-    currentPage: number;
-    pageSize: number;
-  };
-  sort?: null | {
-    field?: keyof ListenerRecord | string;
-    order?: 'asc' | 'ascend' | 'desc' | 'descend' | null;
-  };
-}) {
-  const result = await getListenerResult();
-  const sortedItems = sortListenerItems(result.items, sort);
-  const start = (page.currentPage - 1) * page.pageSize;
-
-  return {
-    items: sortedItems.slice(start, start + page.pageSize),
-    total: result.total,
-  };
-}
-
-function renderActionButton(
-  icon: string,
-  label: string,
-  type: 'danger' | 'primary' | 'text' = 'text',
-) {
-  return h(
-    'button',
-    {
-      class: [
-        'action-button',
-        type === 'danger' ? 'action-button--danger' : '',
-        type === 'primary' ? 'action-button--primary' : '',
-      ],
-      type: 'button',
-      onClick: () => handlePending(label),
-    },
-    [h(IconifyIcon, { icon }), h('span', label)],
-  );
-}
-
-const [Grid, gridApi] = useVbenVxeGrid<ListenerRecord>({
+const [Grid, gridApi] = useVbenVxeGrid({
   gridClass: 'listener-grid',
-  gridOptions: {
-    border: false,
-    checkboxConfig: {
-      highlight: true,
-      trigger: 'row',
-    },
-    headerCellClassName: 'listener-grid__header-cell',
-    rowConfig: {
-      isHover: true,
-      keyField: 'Id',
-    },
-    showHeaderOverflow: 'tooltip',
-    showOverflow: 'tooltip',
-    sortConfig: {
-      trigger: 'cell',
-    },
-    tooltipConfig: {
-      enterable: true,
-      maxWidth: 520,
-      theme: 'dark',
-      contentMethod: (params: {
-        column: {
-          field?: string;
-        };
-        row: ListenerRecord;
-      }) => {
-        const { row, column } = params;
-        if (!row || !column) {
-          return null;
-        }
-        if (['actions', 'Status'].includes(String(column.field ?? ''))) {
-          return null;
-        }
-        return getCellTooltipContent(
-          row as ListenerRecord,
-          String(column.field ?? ''),
-        );
-      },
-    },
-    columns: [
-      {
-        type: 'checkbox',
-        showHeaderOverflow: false,
-        showOverflow: false,
-        width: 54,
-      },
-      {
-        field: 'Id',
-        sortable: true,
-        showHeaderOverflow: false,
-        showOverflow: false,
-        title: $t('page.listener.columns.id'),
-        width: 80,
-      },
-      {
-        field: 'Remark',
-        showOverflow: 'tooltip',
-        title: $t('page.listener.columns.remark'),
-        minWidth: 140,
-        slots: {
-          default: (params: { row: ListenerRecord }) =>
-            h('span', params.row.Remark || '-'),
-        },
-      },
-      {
-        field: 'Mode',
-        sortable: true,
-        showHeaderOverflow: false,
-        showOverflow: false,
-        title: $t('page.listener.columns.mode'),
-        width: 100,
-      },
-      {
-        field: 'ListenAddr',
-        showOverflow: 'tooltip',
-        title: $t('page.listener.columns.listenAddr'),
-        minWidth: 180,
-      },
-      {
-        field: 'ConnectAddr',
-        showOverflow: 'tooltip',
-        title: $t('page.listener.columns.connectAddr'),
-        minWidth: 260,
-        slots: {
-          default: (params: { row: ListenerRecord }) =>
-            h('span', getExternalAddr(params.row)),
-        },
-      },
-      {
-        field: 'DisconnectTimeout',
-        sortable: true,
-        showHeaderOverflow: 'tooltip',
-        showOverflow: false,
-        title: $t('page.listener.columns.disconnectTimeout'),
-        width: 180,
-      },
-      {
-        field: 'PingInterval',
-        sortable: true,
-        showHeaderOverflow: 'tooltip',
-        showOverflow: false,
-        title: $t('page.listener.columns.pingInterval'),
-        width: 150,
-      },
-      {
-        field: 'Status',
-        sortable: true,
-        showHeaderOverflow: false,
-        showOverflow: false,
-        title: $t('page.listener.columns.status'),
-        width: 110,
-        slots: {
-          default: (params: { row: ListenerRecord }) =>
-            h(
-              ElTag,
-              {
-                effect: 'dark',
-                round: true,
-                size: 'small',
-                type: params.row.Status ? 'success' : 'info',
-              },
-              {
-                default: () => getStatusText(params.row.Status),
-              },
-            ),
-        },
-      },
-      {
-        field: 'actions',
-        fixed: 'right',
-        showHeaderOverflow: false,
-        showOverflow: false,
-        title: $t('page.listener.columns.actions'),
-        minWidth: 320,
-        slots: {
-          default: () =>
-            h('div', { class: 'actions-cell' }, [
-              renderActionButton(
-                'ant-design:play-circle-outlined',
-                $t('page.listener.actions.enable'),
-              ),
-              renderActionButton(
-                'ant-design:pause-circle-outlined',
-                $t('page.listener.actions.disable'),
-              ),
-              renderActionButton(
-                'ant-design:edit-outlined',
-                $t('page.listener.actions.edit'),
-              ),
-              renderActionButton(
-                'ant-design:code-outlined',
-                $t('page.listener.actions.command'),
-                'primary',
-              ),
-              renderActionButton(
-                'ant-design:delete-outlined',
-                $t('page.listener.actions.delete'),
-                'danger',
-              ),
-            ]),
-        },
-      },
-    ],
-    height: '100%',
-    keepSource: true,
-    pagerConfig: {
-      enabled: true,
-      pageSize: 10,
-      pageSizes: [10, 20, 50],
-    },
-    proxyConfig: {
-      ajax: {
-        query: async (params: {
-          page: {
-            currentPage: number;
-            pageSize: number;
-          };
-          sort?: {
-            field?: keyof ListenerRecord | string;
-            order?: 'asc' | 'ascend' | 'desc' | 'descend' | null;
-          };
-        }) => await queryListenerList({ page: params.page, sort: params.sort }),
-      },
-    },
-    toolbarConfig: {
-      custom: true,
-    },
+  gridEvents: {
+    checkboxAll: syncSelectedRows,
+    checkboxChange: syncSelectedRows,
   },
+  gridOptions: getGridOptions(false),
+});
+
+const [CreateDrawer, createDrawerApi] = useVbenDrawer({
+  confirmText: $t('page.listener.drawer.create'),
+  destroyOnClose: true,
+  onConfirm: handleCreateConfirm,
+  placement: 'right',
+  title: $t('page.listener.drawer.title'),
 });
 
 function handleBatchSelect() {
   const table = gridApi.grid as any;
-  const selectedRows = table?.getCheckboxRecords?.() ?? [];
-
-  if (selectedRows.length > 0) {
+  if (batchSelectionEnabled.value) {
     table?.clearCheckboxRow?.();
+    selectedRows.value = [];
+    batchSelectionEnabled.value = false;
+    gridApi.setGridOptions({
+      columns: getGridOptions(false).columns,
+    });
     return;
   }
-  table?.setAllCheckboxRow?.(true);
+
+  batchSelectionEnabled.value = true;
+  gridApi.setGridOptions({
+    columns: getGridOptions(true).columns,
+  });
+}
+
+function handleOpenCreateDrawer() {
+  listenerCreateDrawerRef.value?.reset?.();
+  createDrawerApi.open();
+}
+
+function handleClearSelection() {
+  const table = gridApi.grid as any;
+  table?.clearCheckboxRow?.();
+  syncSelectedRows();
+}
+
+function handleBatchDelete() {
+  if (!hasSelection.value) {
+    return;
+  }
+  handleConfirmBatchDelete();
+}
+
+async function handleConfirmBatchDelete() {
+  try {
+    await confirm({
+      cancelText: $t('page.listener.confirm.cancel'),
+      confirmText: $t('page.listener.confirm.confirm'),
+      content: $t('page.listener.confirm.batchDeleteDescription'),
+      title: $t('page.listener.confirm.batchDeleteTitle'),
+    });
+    await deleteListenerListApi({ id: batchDeleteIds.value });
+    ElMessage.success($t('page.listener.messages.deleteSuccess'));
+    const table = gridApi.grid as any;
+    table?.clearCheckboxRow?.();
+    selectedRows.value = [];
+    await gridApi.reload();
+  } catch {}
+}
+
+function syncSelectedRows() {
+  const table = gridApi.grid as any;
+  selectedRows.value = table?.getCheckboxRecords?.() ?? [];
 }
 </script>
 
@@ -351,32 +220,57 @@ function handleBatchSelect() {
     <h1 class="listener-title">{{ $t('page.listener.title') }}</h1>
 
     <div class="listener-panel">
+      <CreateDrawer>
+        <ListenerCreateDrawer ref="listenerCreateDrawerRef" />
+      </CreateDrawer>
+
       <Grid>
         <template #toolbar-actions>
-          <ElButton plain @click="handleBatchSelect">
-            <IconifyIcon icon="ant-design:select-outlined" />
-            <span>{{ $t('page.listener.batchSelect') }}</span>
-          </ElButton>
+          <div class="listener-toolbar-actions">
+            <div
+              v-if="batchSelectionEnabled && hasSelection"
+              class="listener-selection-info"
+            >
+              <IconifyIcon icon="ant-design:info-circle-filled" />
+              <span>
+                {{ $t('page.listener.selectedPrefix') }}{{ selectedCount
+                }}{{ $t('page.listener.selectedSuffix') }}
+              </span>
+              <VbenButton size="xs" variant="link" @click="handleClearSelection">
+                {{ $t('page.listener.clear') }}
+              </VbenButton>
+            </div>
+
+            <VbenButton variant="outline" @click="handleBatchSelect">
+              <IconifyIcon icon="ant-design:select-outlined" />
+              <span>{{ $t('page.listener.batchSelect') }}</span>
+            </VbenButton>
+
+            <VbenButton
+              v-if="batchSelectionEnabled"
+              :disabled="!hasSelection"
+              variant="destructive"
+              @click="handleBatchDelete"
+            >
+              <IconifyIcon icon="ant-design:delete-outlined" />
+              <span>{{ $t('page.listener.batchDelete') }}</span>
+            </VbenButton>
+          </div>
         </template>
 
         <template #toolbar-tools>
           <div class="listener-toolbar-tools">
-            <button
-              class="toolbar-icon-button"
-              type="button"
+            <VbenIconButton
               :title="$t('page.listener.tools.refresh')"
               @click="gridApi.reload()"
             >
               <IconifyIcon icon="ant-design:redo-outlined" />
-            </button>
+            </VbenIconButton>
 
-            <ElButton
-              type="primary"
-              @click="handlePending($t('page.listener.add'))"
-            >
+            <VbenButton @click="handleOpenCreateDrawer">
               <IconifyIcon icon="ant-design:plus-outlined" />
               <span>{{ $t('page.listener.add') }}</span>
-            </ElButton>
+            </VbenButton>
           </div>
         </template>
       </Grid>
@@ -411,53 +305,30 @@ function handleBatchSelect() {
   align-items: center;
 }
 
-.toolbar-icon-button,
-.action-button {
-  cursor: pointer;
-  background: transparent;
-  border: none;
-}
-
-.toolbar-icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  font-size: 16px;
-  color: var(--el-text-color-primary);
-}
-
-.toolbar-icon-button:hover {
-  color: var(--el-color-primary);
-}
-
-.actions-cell {
+.listener-toolbar-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
 }
 
-.action-button {
-  display: inline-flex;
-  gap: 4px;
+.listener-selection-info {
+  display: flex;
   align-items: center;
-  padding: 0;
+  gap: 8px;
+  min-height: 28px;
+  padding: 0 10px;
+  color: #91caff;
+  background: rgb(22 119 255 / 12%);
+  border: 1px solid rgb(22 119 255 / 20%);
+  border-radius: 6px;
   font-size: 13px;
+}
+
+.listener-selection-info :deep(button) {
+  min-height: auto;
+  padding: 0;
   color: var(--el-color-primary);
-}
-
-.action-button--danger {
-  color: var(--el-color-danger);
-}
-
-.action-button--primary {
-  padding: 2px 6px;
-  font-size: 12px;
-  color: #fff;
-  background: var(--el-color-primary);
-  border-radius: 4px;
 }
 
 .listener-panel :deep(.listener-grid) {
@@ -512,8 +383,12 @@ function handleBatchSelect() {
 }
 
 @media (max-width: 1200px) {
+  .listener-toolbar-actions,
   .listener-toolbar-tools {
     flex-wrap: wrap;
+  }
+
+  .listener-toolbar-tools {
     justify-content: flex-end;
   }
 }
