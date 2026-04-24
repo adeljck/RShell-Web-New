@@ -24,8 +24,10 @@ export interface DashboardOverview {
 }
 
 /**
- * 后续对接后端时，直接把页面里的 mock 替换成这个接口即可。
- * 适配返回结构：{ code, message, result }
+ * Dashboard overview data used by the home page summary cards.
+ *
+ * When a real backend is connected, keep this method stable and adapt any
+ * response differences here instead of changing the page component.
  */
 export async function getDashboardOverviewApi() {
   return resultRequestClient.get<DashboardOverview>('/dashboard/overview');

@@ -1,4 +1,7 @@
+import type { BatchIdsPayload, IdPayload, PagedResult } from './_shared';
+
 import { resultRequestClient } from '../request';
+import { coercePagedResult } from './adapters';
 
 export interface ListenerRecord {
   ConnectAddr: string;
@@ -18,18 +21,7 @@ export interface ListenerRecord {
   WsConnectAddr?: string;
 }
 
-export interface ListenerListResult {
-  items: ListenerRecord[];
-  total: number;
-}
-
-export interface ListenerActionPayload {
-  id: number;
-}
-
-export interface ListenerBatchActionPayload {
-  id: number[];
-}
+export interface ListenerListResult extends PagedResult<ListenerRecord> {}
 
 export interface ListenerListQuery {
   ListenerId?: number;
@@ -37,7 +29,7 @@ export interface ListenerListQuery {
   pageSize?: number;
 }
 
-export interface ListenerAddPayload {
+export interface ListenerUpsertPayload {
   ConnectAddr?: string;
   DNSDomain?: string;
   DisconnectTimeout: string;
@@ -48,32 +40,38 @@ export interface ListenerAddPayload {
   OssUrl?: string;
   PingInterval: string;
   PublicDNS?: string;
+  Remark?: string;
   Vkey: string;
   WsConnectAddr?: string;
 }
 
 export async function getListenerListApi(params?: ListenerListQuery) {
-  return resultRequestClient.get<ListenerListResult>('/listener', { params });
+  const result = await resultRequestClient.get<ListenerListResult>('/listener', { params });
+  return coercePagedResult(result) as ListenerListResult;
 }
 
-export async function startListenerApi(data: ListenerActionPayload) {
+export async function startListenerApi(data: IdPayload) {
   return resultRequestClient.post<null>('/listener/start', data);
 }
 
-export async function stopListenerApi(data: ListenerActionPayload) {
+export async function stopListenerApi(data: IdPayload) {
   return resultRequestClient.post<null>('/listener/stop', data);
 }
 
-export async function deleteListenerApi(data: ListenerActionPayload) {
+export async function deleteListenerApi(data: IdPayload) {
   return resultRequestClient.post<null>('/listener/del', data);
 }
 
-export async function deleteListenerListApi(data: ListenerBatchActionPayload) {
+export async function deleteListenerListApi(data: BatchIdsPayload) {
   return resultRequestClient.post<null>('/listener/dellist', data);
 }
 
-export async function addListenerApi(data: ListenerAddPayload) {
+export async function addListenerApi(data: ListenerUpsertPayload) {
   return resultRequestClient.post<null>('/listener/add', data);
+}
+
+export async function editListenerApi(data: ListenerUpsertPayload) {
+  return resultRequestClient.post<null>('/listener/edit', data);
 }
 
 export function getMockListenerList(): ListenerListResult {

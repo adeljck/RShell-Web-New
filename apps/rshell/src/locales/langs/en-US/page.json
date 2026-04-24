@@ -1,4 +1,4 @@
-﻿{
+{
   "auth": {
     "login": "Login"
   },
@@ -25,7 +25,96 @@
     "systemInfo": "System Information"
   },
   "client": {
-    "title": "Client Management"
+    "title": "Client Management",
+    "online": "Online",
+    "offline": "Offline",
+    "batchSelect": "Batch Select",
+    "forwardConnect": "Forward Connect",
+    "search": {
+      "toggle": "Search",
+      "keyword": "Keyword",
+      "keywordPlaceholder": "Please enter",
+      "status": "Status",
+      "statusAll": "All",
+      "reset": "Reset",
+      "query": "Query"
+    },
+    "tools": {
+      "refresh": "Refresh",
+      "density": "Density",
+      "columns": "Columns",
+      "densityDefault": "Default",
+      "densityComfortable": "Comfortable",
+      "densityCompact": "Compact"
+    },
+    "columns": {
+      "id": "ID",
+      "remark": "Remark",
+      "tp": "Type",
+      "addr": "External IP",
+      "location": "Location",
+      "localIp": "Local IP",
+      "userName": "User",
+      "hostName": "Hostname",
+      "osName": "OS Type",
+      "processName": "Process",
+      "status": "Status",
+      "pingCheckTime": "Heartbeat",
+      "actions": "Actions"
+    },
+    "actions": {
+      "hostManage": "Host Manage",
+      "tunnelProxy": "Tunnel Proxy",
+      "deleteFile": "Delete File",
+      "deleteHost": "Delete Host"
+    },
+    "messages": {
+      "forwardPending": "Forward connect is pending",
+      "hostManagePending": "Host management is pending",
+      "tunnelProxyPending": "Tunnel proxy is pending",
+      "densityPending": "Density adjustment is pending",
+      "columnsPending": "Column settings are pending",
+      "deleteFilePending": "Delete file is pending",
+      "deleteHostPending": "Delete host is pending",
+      "remarkSaveSuccess": "Remark saved successfully",
+      "deleteSuccess": "Deleted successfully"
+    },
+    "confirm": {
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "deleteFileTitle": "Confirm Delete File",
+      "deleteFileDescription": "The delete file action will be executed after confirmation. Continue?",
+      "deleteHostTitle": "Confirm Delete Host",
+      "deleteHostDescription": "The delete host action will be executed after confirmation. Continue?",
+      "batchDeleteTitle": "Delete Clients",
+      "batchDeleteDescription": "Are you sure you want to delete the selected clients, including files and processes?"
+    },
+    "forwardDrawer": {
+      "title": "Add Forward Client",
+      "placeholder": "Please enter",
+      "actions": {
+        "connect": "Connect"
+      },
+      "fields": {
+        "ebpfClient": "ebpf Client",
+        "mode": "Connection Type",
+        "serverHost": "IP or Domain",
+        "serverPort": "Port",
+        "wsAddr": "WS Address",
+        "wsAddrTip": "Enter the WebSocket address",
+        "wsAddrHelp": "Format: ws://192.168.1.1:8080/ws, supports wss",
+        "vkey": "Key",
+        "vkeyTip": "Communication credential, verification password for communication.",
+        "encryptSalt": "Traffic Encryption Salt",
+        "proxy": "Use Proxy",
+        "proxyTip": "Supports HTTP and Socks5 proxy, format: socks5://127.0.0.1:1080",
+        "proxyPlaceholder": "Leave empty if unused"
+      }
+    },
+    "batchDelete": "Batch Delete",
+    "selectedPrefix": "Selected ",
+    "selectedSuffix": " records",
+    "clear": "Clear"
   },
   "listener": {
     "title": "Listener Management",
@@ -41,11 +130,16 @@
     "tools": {
       "refresh": "Refresh",
       "density": "Density",
-      "columns": "Column Settings"
+      "columns": "Column Settings",
+      "densityDefault": "Default",
+      "densityComfortable": "Comfortable",
+      "densityCompact": "Compact"
     },
     "drawer": {
       "title": "New Listener",
+      "editTitle": "Edit Listener",
       "create": "Create",
+      "update": "Update",
       "placeholder": "Please enter",
       "fields": {
         "mode": "Mode",
@@ -61,7 +155,8 @@
         "pingInterval": "Heartbeat Interval",
         "vkey": "Key",
         "encryptSalt": "Traffic Encryption Salt",
-        "ossUrl": "Bucket Domain"
+        "ossUrl": "Bucket Domain",
+        "vkeyTip": "Communication credential, verification password for communication."
       },
       "validation": {
         "required": "Please complete all required fields"
@@ -95,19 +190,278 @@
     },
     "messages": {
       "addSuccess": "Created successfully",
+      "editSuccess": "Updated successfully",
       "deleteSuccess": "Deleted successfully",
       "startSuccess": "Started successfully",
-      "stopSuccess": "Stopped successfully"
+      "stopSuccess": "Stopped successfully",
+      "copySuccess": "Copied to clipboard",
+      "copyError": "Copy failed"
+    },
+    "commandDrawer": {
+      "title": "One-click Launch Command",
+      "linux": "Linux Launch Command",
+      "windows": "Windows Launch Command",
+      "copy": "Copy"
     }
   },
   "generator": {
-    "title": "Client Builder"
+    "title": "Client Generator",
+    "comingSoon": "Coming soon",
+    "stage": {
+      "title": "Stage Reverse Client",
+      "description": "Small client for reverse connection launch",
+      "fields": {
+        "target": "Client Type",
+        "listener": "Select Listener"
+      },
+      "placeholder": {
+        "listener": "Please select"
+      },
+      "actions": {
+        "generate": "Generate Download"
+      },
+      "validation": {
+        "listenerRequired": "Please select a listener"
+      },
+      "pending": "Generate download is pending"
+    },
+    "shellcode": {
+      "title": "Shellcode Reverse Client",
+      "description": "Windows shellcode client for reverse connection launch",
+      "fields": {
+        "target": "Client Type",
+        "listener": "Select Listener",
+        "format": "Format"
+      },
+      "placeholder": {
+        "listener": "Please select"
+      },
+      "actions": {
+        "generate": "Generate Download"
+      },
+      "validation": {
+        "listenerRequired": "Please select a listener"
+      },
+      "pending": "Generate download is pending"
+    },
+    "stageless": {
+      "title": "Stageless Reverse Client",
+      "description": "Full client for reverse connection launch",
+      "fields": {
+        "target": "Client Type",
+        "listener": "Select Listener",
+        "proxy": "Connection Proxy",
+        "proxyTip": "Supports HTTP and Socks5 proxy, format: socks5://127.0.0.1:1080",
+        "upx": "Enable UPX Compression"
+      },
+      "placeholder": {
+        "listener": "Please select",
+        "proxy": "Leave empty if unused, only some protocols are supported"
+      },
+      "actions": {
+        "generate": "Generate Download"
+      },
+      "validation": {
+        "listenerRequired": "Please select a listener"
+      },
+      "pending": "Generate download is pending"
+    },
+    "dllStageless": {
+      "title": "DLL Reverse Client",
+      "description": "Windows dll client for reverse connection launch",
+      "fields": {
+        "target": "Client Type",
+        "listener": "Select Listener",
+        "proxy": "Connection Proxy",
+        "proxyTip": "Supports HTTP and Socks5 proxy, format: socks5://127.0.0.1:1080",
+        "upx": "Enable UPX Compression"
+      },
+      "placeholder": {
+        "listener": "Please select",
+        "proxy": "Leave empty if unused, only some protocols are supported"
+      },
+      "actions": {
+        "loader": "Download Loader",
+        "generate": "Generate Download"
+      },
+      "validation": {
+        "listenerRequired": "Please select a listener"
+      },
+      "pendingLoader": "Download loader is pending",
+      "pendingGenerate": "Generate download is pending"
+    },
+    "listen": {
+      "title": "Forward Client",
+      "description": "Listener mode client, connect back online.",
+      "fields": {
+        "target": "Client Type",
+        "mode": "Listener Mode",
+        "listenHost": "Listen Host",
+        "listenPort": "Listen Port",
+        "key": "Key",
+        "keyTip": "Communication credential, verification password for communication.",
+        "encryptSalt": "Traffic Encrypt Salt",
+        "upx": "Enable UPX Compression"
+      },
+      "modeOptions": {
+        "tcp": "TCP",
+        "kcp": "KCP/UDP",
+        "ws": "WebSocket"
+      },
+      "actions": {
+        "generate": "Generate Download"
+      },
+      "pending": "Feature in progress"
+    },
+    "dllListen": {
+      "title": "Forward Client",
+      "description": "Windows DLL listener mode client, connect back online.",
+      "fields": {
+        "target": "Client Type",
+        "mode": "Listener Mode",
+        "listenHost": "Listen Host",
+        "listenPort": "Listen Port",
+        "key": "Key",
+        "keyTip": "Communication credential, verification password for communication.",
+        "encryptSalt": "Traffic Encrypt Salt",
+        "upx": "Enable UPX Compression"
+      },
+      "modeOptions": {
+        "tcp": "TCP",
+        "kcp": "KCP/UDP",
+        "ws": "WebSocket"
+      },
+      "actions": {
+        "loader": "Download Loader",
+        "generate": "Generate Download"
+      },
+      "pendingLoader": "Feature in progress",
+      "pendingGenerate": "Feature in progress"
+    },
+    "ebpfListen": {
+      "title": "ebpf Forward Client",
+      "description": "Linux ebpf listener mode client, connect forward online.",
+      "fields": {
+        "target": "Client Type",
+        "mode": "Listener Mode",
+        "key": "Key",
+        "keyTip": "Communication credential, verification password for communication.",
+        "encryptSalt": "Traffic Encrypt Salt",
+        "upx": "Enable UPX Compression"
+      },
+      "modeOptions": {
+        "tcp": "TCP",
+        "ws": "WebSocket"
+      },
+      "actions": {
+        "generate": "Generate Download"
+      },
+      "pending": "Feature in progress"
+    }
   },
   "plugin": {
-    "title": "Plugin Runtime"
+    "title": "Plugin Runtime",
+    "description": "Files in the plugins directory are treated as plugins and run in memory-loading mode. Supports exe, .net, elf, dll, so and dylib. Custom plugins should follow suffix conventions, for example .net plugins end with net and elf plugins end with elf.",
+    "placeholder": "Please enter",
+    "outputPlaceholder": "output",
+    "outputPrefix": "Output",
+    "actions": {
+      "run": "Run",
+      "upload": "Upload File"
+    },
+    "pending": {
+      "run": "Plugin run is pending",
+      "upload": "Upload file is pending",
+      "uploadSuccess": "Upload successful"
+    },
+    "fields": {
+      "clientId": "Select Client",
+      "pluginId": "Select Plugin",
+      "params": "Parameters"
+    },
+    "selectPlaceholder": "Please select",
+    "uploadTitle": "Upload Plugin",
+    "uploadHint": "Supports exe, net, elf, dll, so and dylib. Each file must be under 500MB, and up to 6 files can be uploaded at the same time."
   },
   "tunnel": {
-    "title": "Tunnel Proxy"
+    "title": "Tunnel Proxy",
+    "description": "Supports TCP, UDP, HTTP and SOCKS5 tunnel proxy.",
+    "batchSelect": "Batch Select",
+    "add": "Add Tunnel",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "online": "Online",
+    "offline": "Offline",
+    "columns": {
+      "id": "ID",
+      "clientId": "Client ID",
+      "remark": "Remark",
+      "mode": "Mode",
+      "port": "Port",
+      "target": "Target (IP:Port)",
+      "username": "Username",
+      "password": "Password",
+      "runStatus": "Tunnel Status",
+      "clientStatus": "Client Status",
+      "actions": "Actions"
+    },
+    "actions": {
+      "enable": "Enable",
+      "disable": "Disable",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "tools": {
+      "refresh": "Refresh",
+      "density": "Density",
+      "columns": "Columns",
+      "densityComfortable": "Comfortable",
+      "densityDefault": "Default",
+      "densityCompact": "Compact"
+    },
+    "messages": {
+      "addPending": "Add tunnel is not implemented yet.",
+      "enablePending": "Enable tunnel is not implemented yet.",
+      "disablePending": "Disable tunnel is not implemented yet.",
+      "editPending": "Edit tunnel is not implemented yet.",
+      "deletePending": "Delete tunnel is not implemented yet.",
+      "startSuccess": "Started successfully",
+      "stopSuccess": "Stopped successfully",
+      "deleteSuccess": "Deleted successfully",
+      "batchDeleteTitle": "Batch delete tunnels",
+      "batchDeleteConfirm": "Are you sure you want to delete the selected tunnels?",
+      "deleteTitle": "Delete tunnel",
+      "deleteConfirm": "Are you sure you want to delete this tunnel?",
+      "addSuccess": "Created successfully",
+      "editSuccess": "Saved successfully"
+    },
+    "drawer": {
+      "title": "Add Tunnel Proxy",
+      "create": "Create",
+      "placeholder": "Please enter",
+      "fields": {
+        "clientId": "Select Client",
+        "mode": "Mode",
+        "remark": "Remark",
+        "port": "Server Port",
+        "target": "Target (IP:Port)",
+        "username": "Username",
+        "password": "Password"
+      },
+      "modeOptions": {
+        "socks5": "Socks5 Tunnel",
+        "http": "HTTP Tunnel",
+        "tcp": "TCP Proxy",
+        "udp": "UDP Proxy"
+      },
+      "editTitle": "Edit Tunnel Proxy",
+      "update": "Save",
+      "editClientReadonly": "Client is read-only in edit mode and cannot be changed."
+    },
+    "batchDelete": "Batch Delete",
+    "selectedPrefix": "Selected ",
+    "selectedSuffix": " records",
+    "clear": "Clear"
   },
   "setting": {
     "title": "System Settings",
@@ -127,5 +481,31 @@
   "about": {
     "title": "About",
     "releaseDetails": "Release Details"
+  },
+  "uploadDialog": {
+    "empty": "No files selected",
+    "columns": {
+      "path": "Path",
+      "name": "File Name",
+      "size": "File Size",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "uploading": "Uploading",
+      "success": "Uploaded",
+      "error": "Upload failed"
+    },
+    "actions": {
+      "pick": "Choose File",
+      "remove": "Remove",
+      "close": "Close",
+      "start": "Start Upload"
+    },
+    "messages": {
+      "maxCount": "You can select up to {0} files",
+      "maxSize": "{0} exceeds the {1}MB size limit"
+    }
   }
 }

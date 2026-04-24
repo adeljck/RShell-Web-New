@@ -6,6 +6,8 @@ import { ElCard } from 'element-plus';
 import { getAboutInfoApi, getMockAboutInfo } from '#/api';
 import { $t } from '#/locales';
 
+import '../_shared/workspace-page.css';
+
 defineOptions({ name: 'About' });
 
 const aboutInfo = ref(getMockAboutInfo());
@@ -30,10 +32,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="about-page">
-    <h1 class="about-title">{{ $t('page.about.title') }}</h1>
+  <div class="about-page workspace-page">
+    <h1 class="about-title workspace-page__title">{{ $t('page.about.title') }}</h1>
 
-    <ElCard shadow="never" class="about-card">
+    <ElCard shadow="never" class="about-card workspace-page__meta-card">
       <template #header>
         <div class="about-card__title">{{ releaseTitle }}</div>
       </template>
@@ -48,25 +50,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.about-page {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 12px;
-}
-
-.about-title {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--el-text-color-primary);
-}
-
 .about-card {
-  width: min(100%, 660px);
-  border: 1px solid var(--el-border-color-lighter);
-  border-radius: 12px;
+  width: min(100%, 680px);
 }
 
 .about-card :deep(.el-card__header) {

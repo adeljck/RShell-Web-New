@@ -3,7 +3,6 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 
 import { h } from 'vue';
 
-import { VbenButton } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 
 type ActionVariant = 'danger' | 'primary' | 'text';
@@ -28,6 +27,7 @@ interface CreateListenerGridOptionsOptions {
   getListenerResult: () => Promise<ListenerListResult>;
   onAction: (action: ListenerActionType, row: ListenerRecord) => void;
   showCheckboxColumn?: boolean;
+  size?: 'medium' | 'mini' | 'small';
   t: ListenerTranslate;
 }
 
@@ -36,6 +36,7 @@ interface ListenerActionConfig {
   icon: string;
   key: string;
   variant?: ActionVariant;
+  visible?: (row: ListenerRecord) => boolean;
 }
 
 const LISTENER_ACTIONS: ListenerActionConfig[] = [
@@ -59,6 +60,7 @@ const LISTENER_ACTIONS: ListenerActionConfig[] = [
     icon: 'ant-design:code-outlined',
     key: 'page.listener.actions.command',
     variant: 'primary',
+    visible: (row) => ['tcp', 'ws'].includes(row.Mode),
   },
   {
     action: 'delete',
@@ -76,6 +78,7 @@ export function createListenerGridOptions({
   getListenerResult,
   onAction,
   showCheckboxColumn = false,
+  size = 'small',
   t,
 }: CreateListenerGridOptionsOptions): VxeTableGridOptions<ListenerRecord> {
   const columns: NonNullable<VxeTableGridOptions<ListenerRecord>['columns']> = [];
@@ -191,7 +194,7 @@ export function createListenerGridOptions({
       showHeaderOverflow: false,
       showOverflow: false,
       title: t('page.listener.columns.actions'),
-      minWidth: 320,
+      minWidth: 420,
       slots: {
         default: (params: { row: ListenerRecord }) =>
           h(
@@ -208,19 +211,20 @@ export function createListenerGridOptions({
                 whiteSpace: 'nowrap',
               },
             },
-            LISTENER_ACTIONS.map((action, index) =>
-              renderActionButton({
-                action: action.action,
-                disabled:
-                  (action.action === 'enable' && params.row.Status) ||
-                  (action.action === 'disable' && !params.row.Status),
-                icon: action.icon,
-                isLast: index === LISTENER_ACTIONS.length - 1,
-                label: t(action.key),
-                onAction,
-                row: params.row,
-                variant: action.variant ?? 'text',
-              }),
+            LISTENER_ACTIONS.filter((action) => action.visible?.(params.row) ?? true).map(
+              (action, index, actions) =>
+                renderActionButton({
+                  action: action.action,
+                  disabled:
+                    (action.action === 'enable' && params.row.Status) ||
+                    (action.action === 'disable' && !params.row.Status),
+                  icon: action.icon,
+                  isLast: index === actions.length - 1,
+                  label: t(action.key),
+                  onAction,
+                  row: params.row,
+                  variant: action.variant ?? 'text',
+                }),
             ),
           ),
       },
@@ -238,8 +242,12 @@ export function createListenerGridOptions({
       isHover: true,
       keyField: 'Id',
     },
+    customConfig: {
+      storage: true,
+    },
     showHeaderOverflow: 'tooltip',
     showOverflow: 'tooltip',
+    size,
     sortConfig: {
       trigger: 'cell',
     },
@@ -286,9 +294,6 @@ export function createListenerGridOptions({
             sort: params.sort,
           }),
       },
-    },
-    toolbarConfig: {
-      custom: true,
     },
   };
 }
@@ -403,13 +408,15 @@ function renderActionButton({
     },
     [
       h(
-        VbenButton,
+        'button',
         {
           class: 'action-button',
           disabled,
-          size: 'xs',
-          variant: 'link',
           style: {
+            alignItems: 'center',
+            appearance: 'none',
+            background: 'transparent',
+            border: 'none',
             color:
               disabled
                 ? 'var(--el-text-color-disabled)'
@@ -421,12 +428,12 @@ function renderActionButton({
             flexShrink: '0',
             fontSize: '12px',
             gap: '4px',
-            height: 'auto',
             lineHeight: '1',
-            minHeight: 'unset',
             opacity: disabled ? '0.5' : '1',
-            padding: '0 4px 0 0',
+            padding: '0',
+            whiteSpace: 'nowrap',
           },
+          type: 'button',
           onClick: () => {
             if (disabled) {
               return;
@@ -434,12 +441,10 @@ function renderActionButton({
             onAction(action, row);
           },
         },
-        {
-          default: () => [
-            h(IconifyIcon, { icon, style: { fontSize: '14px' } }),
-            h('span', { style: { whiteSpace: 'nowrap' } }, label),
-          ],
-        },
+        [
+          h(IconifyIcon, { icon, style: { flexShrink: '0', fontSize: '14px' } }),
+          h('span', { style: { whiteSpace: 'nowrap' } }, label),
+        ],
       ),
       !isLast
         ? h('span', {
@@ -448,7 +453,7 @@ function renderActionButton({
               display: 'inline-flex',
               flexShrink: '0',
               height: '12px',
-              margin: '0 12px 0 8px',
+              margin: '0 14px',
               width: '1px',
             },
           })

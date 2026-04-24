@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import type { ListenerAddPayload } from '#/api';
+import type { ListenerRecord, ListenerUpsertPayload } from '#/api';
 import type { VbenFormSchema } from '#/adapter/form';
 
-import { computed, reactive } from 'vue';
+import { computed, h, reactive, ref } from 'vue';
 
+import { IconifyIcon } from '@vben/icons';
+import { ElTooltip } from 'element-plus';
 import { useVbenForm, z } from '#/adapter/form';
 import { $t } from '#/locales';
 
@@ -127,6 +129,29 @@ function requiredNumberRule(label: string) {
   });
 }
 
+function renderLabelWithTooltip(label: string, content: string) {
+  return () =>
+    h('span', { class: 'listener-create-drawer__label-with-help' }, [
+      h('span', label),
+      h(
+        ElTooltip,
+        {
+          content,
+          effect: 'dark',
+          placement: 'top',
+          popperClass: 'listener-create-drawer-tooltip',
+        },
+        {
+          default: () =>
+            h(IconifyIcon, {
+              class: 'listener-create-drawer__help-icon',
+              icon: 'ant-design:info-circle-outlined',
+            }),
+        },
+      ),
+    ]);
+}
+
 function buildSchema(defaultValues: ListenerCreateFormValues): VbenFormSchema[] {
   const modeLabel = $t('page.listener.drawer.fields.mode');
   const listenAddrLabel = $t('page.listener.drawer.fields.listenAddr');
@@ -139,6 +164,7 @@ function buildSchema(defaultValues: ListenerCreateFormValues): VbenFormSchema[] 
   const disconnectTimeoutLabel = $t('page.listener.drawer.fields.disconnectTimeout');
   const pingIntervalLabel = $t('page.listener.drawer.fields.pingInterval');
   const vkeyLabel = $t('page.listener.drawer.fields.vkey');
+  const vkeyTip = $t('page.listener.drawer.fields.vkeyTip');
   const encryptSaltLabel = $t('page.listener.drawer.fields.encryptSalt');
   const ossUrlLabel = $t('page.listener.drawer.fields.ossUrl');
 
@@ -314,7 +340,7 @@ function buildSchema(defaultValues: ListenerCreateFormValues): VbenFormSchema[] 
       defaultValue: defaultValues.vkey,
       fieldName: 'vkey',
       formItemClass: requiredFormItemClass,
-      label: vkeyLabel,
+      label: renderLabelWithTooltip(vkeyLabel, vkeyTip),
       rules: requiredStringRule(vkeyLabel),
     },
     {
@@ -349,6 +375,7 @@ function buildSchema(defaultValues: ListenerCreateFormValues): VbenFormSchema[] 
 }
 
 const initialValues = createDefaultFormValues();
+const editingId = ref('0');
 let syncing = false;
 
 const [Form, formApi] = useVbenForm(
@@ -424,13 +451,20 @@ async function submit() {
   }
 
   const values = await formApi.getValues<ListenerCreateFormValues>();
-  const payload: ListenerAddPayload = {
+  const payload: ListenerUpsertPayload = {
+    ConnectAddr: '',
+    DNSDomain: '',
     DisconnectTimeout: String(values.disconnectTimeout),
     EncryptSalt: values.encryptSalt,
-    Id: '0',
+    Id: editingId.value,
+    ListenAddr: '',
     Mode: values.mode,
+    OssUrl: '',
     PingInterval: String(values.pingInterval),
+    PublicDNS: '',
+    Remark: values.remark,
     Vkey: values.vkey,
+    WsConnectAddr: '',
   };
 
   if (!isOssMode(values.mode)) {
@@ -464,14 +498,39 @@ async function submit() {
 }
 
 async function reset() {
+  editingId.value = '0';
   await formApi.resetForm({
     values: createDefaultFormValues(),
   });
   await formApi.resetValidate();
 }
 
+async function setValues(record: ListenerRecord) {
+  editingId.value = String(record.Id);
+  await formApi.resetForm({
+    values: {
+      connectAddr: record.ConnectAddr || '',
+      disconnectTimeout: Number(record.DisconnectTimeout || 0),
+      dnsDomain: record.DNSDomain || '',
+      encryptSalt: record.EncryptSalt || '',
+      listenAddr: record.ListenAddr || '',
+      mode: record.Mode || 'tcp',
+      ossUrl: record.OssUrl || '',
+      pingInterval: Number(record.PingInterval || 0),
+      publicDoh: record.Mode === 'doh' ? record.PublicDNS || '' : '',
+      publicDot: record.Mode === 'dot' ? record.PublicDNS || '' : '',
+      publicDns: record.Mode === 'dns' ? record.PublicDNS || '' : '',
+      remark: record.Remark || '',
+      vkey: record.Vkey || '',
+      wsConnectAddr: record.WsConnectAddr || '',
+    },
+  });
+  await formApi.resetValidate();
+}
+
 defineExpose({
   reset,
+  setValues,
   submit,
 });
 </script>
@@ -542,10 +601,41 @@ defineExpose({
   width: 100%;
 }
 
+.listener-create-drawer :deep(.listener-create-drawer__label-with-help) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.listener-create-drawer :deep(.listener-create-drawer__help-icon) {
+  color: var(--el-text-color-secondary);
+  font-size: 14px;
+  cursor: help;
+}
+
 .listener-create-drawer
   :deep(.listener-create-drawer__required .el-form-item__label::before) {
   margin-right: 4px;
   color: var(--el-color-danger);
   content: '*';
+}
+</style>
+
+<style>
+.listener-create-drawer-tooltip.el-popper.is-dark {
+  max-width: 620px;
+  padding: 14px 18px;
+  color: #fff;
+  background: #4a4a4a;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgb(0 0 0 / 22%);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.listener-create-drawer-tooltip.el-popper.is-dark .el-popper__arrow::before {
+  background: #4a4a4a;
+  border: none;
 }
 </style>

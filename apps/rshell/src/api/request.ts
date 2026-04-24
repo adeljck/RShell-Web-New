@@ -1,5 +1,8 @@
 /**
- * 该文件可自行根据业务逻辑进行调整
+ * Shared request clients for the RShell application.
+ *
+ * Keep business-specific response handling in module APIs and leave
+ * authentication / refresh-token logic centralized here.
  */
 import type { RequestClientOptions } from '@vben/request';
 
@@ -34,7 +37,7 @@ function createRequestClient(
   });
 
   /**
-   * 重新认证逻辑
+   * Reset the current session when both access and refresh tokens are invalid.
    */
   async function doReAuthenticate() {
     console.warn('Access token or refresh token is invalid or expired. ');
@@ -52,7 +55,7 @@ function createRequestClient(
   }
 
   /**
-   * 刷新token逻辑
+   * Refresh the access token and return the new bearer token.
    */
   async function doRefreshToken() {
     const accessStore = useAccessStore();
@@ -66,7 +69,7 @@ function createRequestClient(
     return token ? `Bearer ${token}` : null;
   }
 
-  // 请求头处理
+  // Attach auth and locale headers before every request.
   client.addRequestInterceptor({
     fulfilled: async (config) => {
       const accessStore = useAccessStore();
@@ -77,7 +80,7 @@ function createRequestClient(
     },
   });
 
-  // 处理返回的响应数据格式
+  // Normalize the common API envelope.
   client.addResponseInterceptor(
     defaultResponseInterceptor({
       codeField: 'code',
@@ -86,7 +89,7 @@ function createRequestClient(
     }),
   );
 
-  // token过期的处理
+  // Handle token expiration and refresh automatically.
   client.addResponseInterceptor(
     authenticateResponseInterceptor({
       client,
@@ -97,14 +100,11 @@ function createRequestClient(
     }),
   );
 
-  // 通用的错误处理,如果没有进入上面的错误处理逻辑，就会进入这里
+  // Fallback error messaging for requests that do not match custom logic.
   client.addResponseInterceptor(
     errorMessageResponseInterceptor((msg: string, error) => {
-      // 这里可以根据业务进行定制,你可以拿到 error 内的信息进行定制化处理，根据不同的 code 做不同的提示，而不是直接使用 message.error 提示 msg
-      // 当前mock接口返回的错误字段是 error 或者 message
       const responseData = error?.response?.data ?? {};
       const errorMessage = responseData?.error ?? responseData?.message ?? '';
-      // 如果没有错误信息，则会根据状态码进行提示
       ElMessage.error(errorMessage || msg);
     }),
   );

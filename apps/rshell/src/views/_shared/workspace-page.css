@@ -1,0 +1,124 @@
+.workspace-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 12px 8px 0;
+}
+
+.workspace-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.workspace-page__title {
+  margin: 0;
+  color: var(--el-text-color-primary);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.workspace-page__description {
+  margin: 0;
+  color: var(--el-text-color-regular);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.workspace-page__surface {
+  min-height: calc(100vh - 250px);
+  padding: 18px 20px 22px;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 2%), rgb(255 255 255 / 0%)),
+    var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgb(0 0 0 / 8%);
+}
+
+.workspace-page__section {
+  width: min(1280px, 100%);
+}
+
+.workspace-page__meta-card {
+  width: min(100%, 680px);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 2%), rgb(255 255 255 / 0%)),
+    var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgb(0 0 0 / 8%);
+}
+
+.workspace-page__field-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.workspace-page__field-row--required .workspace-page__field-label::before {
+  margin-right: 4px;
+  color: var(--el-color-danger);
+  content: '*';
+}
+
+.workspace-page__field-label {
+  flex: 0 0 126px;
+  color: var(--el-text-color-primary);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 32px;
+  text-align: right;
+}
+
+.workspace-page__field-control {
+  width: 560px;
+  max-width: calc(100% - 140px);
+}
+
+.workspace-page__field-control--wide {
+  width: min(1130px, calc(100% - 140px));
+}
+
+.workspace-page__field-input,
+.workspace-page__field-select {
+  width: 100%;
+}
+
+.workspace-page__field-select :deep(.el-select__wrapper),
+.workspace-page__field-input :deep(.el-input__wrapper) {
+  min-height: 32px;
+  border-radius: 6px;
+}
+
+.workspace-page__actions {
+  display: flex;
+  gap: 12px;
+  margin-left: 140px;
+}
+
+@media (max-width: 1200px) {
+  .workspace-page__surface {
+    padding: 16px;
+  }
+
+  .workspace-page__field-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .workspace-page__field-label,
+  .workspace-page__field-control,
+  .workspace-page__field-control--wide {
+    width: 100%;
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .workspace-page__actions {
+    margin-left: 0;
+  }
+}

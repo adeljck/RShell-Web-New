@@ -1,4 +1,4 @@
-﻿<script lang="ts" setup>
+<script lang="ts" setup>
 import { computed } from 'vue';
 
 import { AuthPageLayout } from '@vben/layouts';
@@ -17,26 +17,25 @@ const logoDark = computed(() => preferences.logo.sourceDark);
     class="rshell-auth-layout"
   >
     <template #logo></template>
-    <!-- 自定义工具栏 -->
-    <!-- <template #toolbar></template> -->
   </AuthPageLayout>
 </template>
 
 <style scoped>
 .rshell-auth-layout:deep(.rounded-3xl.pb-20.shadow-float) {
-  width: min(28rem, calc(100% - 2rem));
-  max-width: 28rem;
-  min-height: 28rem;
-  padding-right: 2rem;
-  padding-bottom: 4rem;
-  padding-left: 2rem;
+  width: min(30rem, calc(100% - 2rem));
+  max-width: 30rem;
+  min-height: 28.5rem;
+  padding: 2.25rem 2rem 3.4rem;
+  border: 1px solid var(--el-border-color-lighter);
+  box-shadow: 0 16px 38px rgb(0 0 0 / 14%);
 }
 
 .rshell-auth-layout:deep(.side-content[data-side='bottom']) {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 22rem;
+  gap: 0.25rem;
+  max-width: 23rem;
   min-height: 22rem;
   margin-top: 0;
 }
@@ -45,9 +44,7 @@ const logoDark = computed(() => preferences.logo.sourceDark);
   .rshell-auth-layout:deep(.rounded-3xl.pb-20.shadow-float) {
     width: calc(100% - 1.5rem);
     min-height: auto;
-    padding-right: 1.5rem;
-    padding-bottom: 3rem;
-    padding-left: 1.5rem;
+    padding: 1.75rem 1.5rem 2.5rem;
   }
 
   .rshell-auth-layout:deep(.side-content[data-side='bottom']) {

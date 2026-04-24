@@ -1,28 +1,17 @@
-import type {
-  BatchIdsPayload,
-  BooleanStatusQuery,
-  IdPayload,
-  PagedQuery,
-  PagedResult,
-} from './_shared';
-
-import { resultRequestClient } from '../request';
-import { coercePagedResult } from './adapters';
-
-export interface ClientFlowRecord {
+interface ClientFlowRecord {
   ExportFlow: number;
   FlowLimit: number;
   InletFlow: number;
 }
 
-export interface ClientRateRecord {
+interface ClientRateRecord {
   [key: string]: number;
 }
 
-export interface ClientListRecord {
+interface ClientListRecord {
   Addr: string;
-  HostName: string;
   Flow: ClientFlowRecord;
+  HostName: string;
   Id: number;
   IsConnect: boolean;
   LocalIP: string;
@@ -43,44 +32,7 @@ export interface ClientListRecord {
   VerifyKey: string;
 }
 
-export interface ClientListQuery extends PagedQuery {
-  search?: string;
-  status?: BooleanStatusQuery;
-}
-
-export interface ClientListResult extends PagedResult<ClientListRecord> {
-  clientCount: number;
-  clientOnlineCount: number;
-}
-
-export async function getClientListApi(data: ClientListQuery) {
-  const result = await resultRequestClient.post<ClientListResult>('/client/list', data);
-  return {
-    ...coercePagedResult(result),
-    clientCount: Number.isFinite(result?.clientCount) ? Number(result.clientCount) : 0,
-    clientOnlineCount: Number.isFinite(result?.clientOnlineCount)
-      ? Number(result.clientOnlineCount)
-      : 0,
-  } satisfies ClientListResult;
-}
-
-export async function editClientRemarkApi(data: IdPayload & { remark: string }) {
-  return resultRequestClient.post('/client/editremark', data);
-}
-
-export async function deleteClientFileApi(data: IdPayload) {
-  return resultRequestClient.post('/client/delfile', data);
-}
-
-export async function deleteClientProcessApi(data: IdPayload) {
-  return resultRequestClient.post('/client/delprocess', data);
-}
-
-export async function deleteClientListApi(data: BatchIdsPayload) {
-  return resultRequestClient.post('/client/dellist', data);
-}
-
-const MOCK_CLIENT_LIST: ClientListRecord[] = [
+const CLIENT_LIST: ClientListRecord[] = [
   {
     Id: 10,
     IsConnect: true,
@@ -345,20 +297,30 @@ const MOCK_CLIENT_LIST: ClientListRecord[] = [
   }),
 ];
 
-export function getMockClientList(query: ClientListQuery): ClientListResult {
-  const search = query.search?.trim().toLowerCase() ?? '';
-  const status = query.status ?? '';
+export interface ClientListFilter {
+  page: number;
+  pageSize: number;
+  search?: string;
+  status?: '' | '0' | '1' | boolean;
+}
 
-  const filtered = MOCK_CLIENT_LIST.filter((item) => {
-    const matchStatus =
+export function queryClientList({
+  page,
+  pageSize,
+  search = '',
+  status = '',
+}: ClientListFilter) {
+  const normalizedSearch = search.trim().toLowerCase();
+  const filtered = CLIENT_LIST.filter((item) => {
+    const statusMatched =
       status === ''
         ? true
-        : status === '1'
+        : status === true || status == '1'
           ? item.IsConnect
           : !item.IsConnect;
 
-    const matchSearch =
-      search === ''
+    const searchMatched =
+      normalizedSearch === ''
         ? true
         : [
             item.Id,
@@ -375,18 +337,56 @@ export function getMockClientList(query: ClientListQuery): ClientListResult {
           ]
             .join(' ')
             .toLowerCase()
-            .includes(search);
+            .includes(normalizedSearch);
 
-    return matchStatus && matchSearch;
+    return statusMatched && searchMatched;
   });
 
-  const start = (query.page - 1) * query.pageSize;
-  const items = filtered.slice(start, start + query.pageSize);
+  const start = (page - 1) * pageSize;
 
   return {
     clientCount: filtered.length,
     clientOnlineCount: filtered.filter((item) => item.IsConnect).length,
-    items,
+    items: filtered.slice(start, start + pageSize),
     total: filtered.length,
   };
+}
+
+export function updateClientRemark(id: number, remark: string) {
+  const target = CLIENT_LIST.find((item) => item.Id === id);
+  if (!target) {
+    return false;
+  }
+  target.Remark = remark;
+  return true;
+}
+
+export function deleteClientProcess(id: number) {
+  const index = CLIENT_LIST.findIndex((item) => item.Id === id);
+  if (index < 0) {
+    return false;
+  }
+  CLIENT_LIST.splice(index, 1);
+  return true;
+}
+
+export function deleteClientFile(id: number) {
+  return CLIENT_LIST.some((item) => item.Id === id);
+}
+
+export function deleteClientList(ids: number[]) {
+  if (!ids.length) {
+    return false;
+  }
+
+  let deletedCount = 0;
+  for (const id of ids) {
+    const index = CLIENT_LIST.findIndex((item) => item.Id === id);
+    if (index >= 0) {
+      CLIENT_LIST.splice(index, 1);
+      deletedCount++;
+    }
+  }
+
+  return deletedCount > 0;
 }

@@ -16,7 +16,7 @@ interface ListenerRecord {
   WsConnectAddr?: string;
 }
 
-interface ListenerAddPayload {
+interface ListenerUpsertPayload {
   ConnectAddr?: string;
   DNSDomain?: string;
   DisconnectTimeout: string;
@@ -27,6 +27,7 @@ interface ListenerAddPayload {
   OssUrl?: string;
   PingInterval: string;
   PublicDNS?: string;
+  Remark?: string;
   Vkey: string;
   WsConnectAddr?: string;
 }
@@ -161,7 +162,7 @@ export function deleteListenerList(ids: number[]) {
   return deletedIds;
 }
 
-export function addListener(payload: ListenerAddPayload) {
+export function addListener(payload: ListenerUpsertPayload) {
   const nextId =
     listenerStore.reduce((max, item) => Math.max(max, item.Id), 0) + 1;
 
@@ -193,7 +194,7 @@ export function addListener(payload: ListenerAddPayload) {
     OssUrl: payload.OssUrl || '',
     PingInterval: Number(payload.PingInterval || 0),
     PublicDNS: payload.PublicDNS || '',
-    Remark: '',
+    Remark: payload.Remark || '',
     Status: false,
     Vkey: payload.Vkey,
     WsConnectAddr: payload.WsConnectAddr || '',
@@ -203,5 +204,47 @@ export function addListener(payload: ListenerAddPayload) {
 
   return {
     record,
+  };
+}
+
+
+export function editListener(payload: ListenerUpsertPayload) {
+  const id = Number(payload.Id || 0);
+  const listener = listenerStore.find((item) => item.Id === id);
+  if (!listener) {
+    return null;
+  }
+
+  const duplicated = listenerStore.some(
+    (item) => item.Id !== id && payload.ListenAddr && item.ListenAddr === payload.ListenAddr,
+  );
+
+  if (duplicated) {
+    const publicAddr = (payload.ListenAddr || '').replace('0.0.0.0', '123.57.106.8');
+    return {
+      error: {
+        code: -1,
+        message: `listener ${id} start error addr ${publicAddr} open failed`,
+        result: null,
+        type: 'error',
+      },
+    };
+  }
+
+  listener.ConnectAddr = payload.ConnectAddr || '';
+  listener.DNSDomain = payload.DNSDomain || '';
+  listener.DisconnectTimeout = Number(payload.DisconnectTimeout || 0);
+  listener.EncryptSalt = payload.EncryptSalt;
+  listener.ListenAddr = payload.ListenAddr || '';
+  listener.Mode = payload.Mode;
+  listener.OssUrl = payload.OssUrl || '';
+  listener.PingInterval = Number(payload.PingInterval || 0);
+  listener.PublicDNS = payload.PublicDNS || '';
+  listener.Remark = payload.Remark || '';
+  listener.Vkey = payload.Vkey;
+  listener.WsConnectAddr = payload.WsConnectAddr || '';
+
+  return {
+    record: listener,
   };
 }
